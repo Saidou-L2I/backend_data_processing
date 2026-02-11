@@ -14,6 +14,7 @@ def analyze_data(df):
 
     return {
         "shape": list(df.shape),
+        "columns": int(df.shape[1]),
         "missing_total": int(df.isnull().sum().sum()),
         "duplicates": int(df.duplicated().sum()),
         "outliers_total": int(outliers_count)
