@@ -7,30 +7,15 @@ app = Flask(__name__)
 CORS(app)
 
 processor = DataProcessor()
-"""UPLOAD_FOLDER = "uploads"
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)"""
-UPLOAD_FOLDER = "uploads"       # pour les fichiers uploadés temporairement
-RESULT_FOLDER = "results"       # pour les fichiers finaux à télécharger
+
+UPLOAD_FOLDER = "uploads"
+RESULT_FOLDER = "results"
+
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(RESULT_FOLDER, exist_ok=True)
 
-("""@app.route("/process", methods=["POST"])
-def process():
-    file = request.files.get("file")
-    if not file:
-        return jsonify({"error": "No file"}), 400
 
-    path = os.path.join(UPLOAD_FOLDER, file.filename)
-    file.save(path)
-
-    options = request.form.to_dict()
-    result = processor.process(path, options)
-
-    os.remove(path)
-    return jsonify(result)
-"""
-
-@app.route("/process", methods=["POST"]))
+@app.route("/process", methods=["POST"])
 def process():
     try:
         file = request.files.get("file")
@@ -42,7 +27,11 @@ def process():
 
         options = request.form.to_dict()
 
-        result = processor.process(temp_path, options, result_folder=RESULT_FOLDER)
+        result = processor.process(
+            temp_path,
+            options,
+            result_folder=RESULT_FOLDER
+        )
 
         os.remove(temp_path)
 
@@ -52,9 +41,7 @@ def process():
         print("ERREUR PROCESS:", str(e))
         return jsonify({"error": str(e)}), 500
 
-"""@app.route("/download/<filename>")
-def download(filename):
-    return send_file(os.path.join(UPLOAD_FOLDER, filename), as_attachment=True)"""
+
 @app.route("/download/<filename>")
 def download(filename):
     file_path = os.path.join(RESULT_FOLDER, filename)
@@ -63,12 +50,12 @@ def download(filename):
 
     return send_file(file_path, as_attachment=True)
 
+
 @app.route("/", methods=["GET"])
 def home():
     return {"message": "API Flask OK 🚀"}
 
 
 if __name__ == "__main__":
-    #app.run(debug=True)
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
