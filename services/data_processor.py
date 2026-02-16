@@ -7,10 +7,12 @@ from processors.outliers import handle_outliers_smart
 from processors.normalization import normalize
 
 UPLOAD_FOLDER = "uploads"
+RESULT_FOLDER = "results"
 
 class DataProcessor:
 
-    def process(self, file_path, options):
+    #def process(self, file_path, options):
+    def process(self, file_path, options, result_folder="results"):
         df = load_file(file_path)
 
         original = analyze_data(df)
@@ -18,16 +20,22 @@ class DataProcessor:
         df = remove_duplicates(df)
         df = handle_missing(df, options.get("handle_missing", "fill_mean"))
 
-        if options.get("handle_outliers") == "smart":
-            df = handle_outliers_smart(df)
+        df=handle_outliers_smart(df)
 
         if options.get("normalize") == "true":
             df = normalize(df, options.get("norm_method", "minmax"))
 
         final = analyze_data(df)
 
-        filename = f"proc_{uuid.uuid4()}.csv"
-        df.to_csv(os.path.join(UPLOAD_FOLDER, filename), index=False)
+        # 🔥 Choix du format
+        file_format = options.get("file_format", "csv").lower()
+        filename = f"proc_{uuid.uuid4()}"
+        if file_format == "excel":
+            filename += ".xlsx"
+            df.to_excel(os.path.join(result_folder, filename), index=False)
+        else:
+            filename += ".csv"
+            df.to_csv(os.path.join(result_folder, filename), index=False)
 
         return {
             "success": True,
