@@ -12,7 +12,10 @@ def handle_outliers_smart(df):
         lower = Q1 - 1.5 * IQR
         upper = Q3 + 1.5 * IQR
 
-        # Remplacer les valeurs hors bornes par lower ou upper
-        df_res[col] = np.clip(df_res[col], lower, upper)
+        df_res[col] = df_res[col].apply(
+            lambda x: lower if x < lower
+            else upper if x > upper
+            else x
+        )
 
     return df_res
