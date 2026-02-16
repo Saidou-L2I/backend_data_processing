@@ -7,7 +7,7 @@ from processors.outliers import handle_outliers_smart
 from processors.normalization import normalize
 
 UPLOAD_FOLDER = "uploads"
-RESULT_FOLDER = "results"
+#RESULT_FOLDER = "results"
 
 class DataProcessor:
 

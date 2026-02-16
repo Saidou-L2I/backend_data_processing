@@ -14,7 +14,7 @@ RESULT_FOLDER = "results"       # pour les fichiers finaux à télécharger
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(RESULT_FOLDER, exist_ok=True)
 
-"""@app.route("/process", methods=["POST"])
+("""@app.route("/process", methods=["POST"])
 def process():
     file = request.files.get("file")
     if not file:
@@ -29,26 +29,28 @@ def process():
     os.remove(path)
     return jsonify(result)
 """
-@app.route("/process", methods=["POST"])
+
+@app.route("/process", methods=["POST"]))
 def process():
-    file = request.files.get("file")
-    if not file:
-        return jsonify({"error": "No file"}), 400
+    try:
+        file = request.files.get("file")
+        if not file:
+            return jsonify({"error": "No file"}), 400
 
-    # Sauvegarde temporaire
-    temp_path = os.path.join(UPLOAD_FOLDER, file.filename)
-    file.save(temp_path)
+        temp_path = os.path.join(UPLOAD_FOLDER, file.filename)
+        file.save(temp_path)
 
-    # Récupération des options Angular
-    options = request.form.to_dict()
+        options = request.form.to_dict()
 
-    # Traitement
-    result = processor.process(temp_path, options, result_folder=RESULT_FOLDER)
+        result = processor.process(temp_path, options, result_folder=RESULT_FOLDER)
 
-    # Supprime le fichier uploadé temporaire
-    os.remove(temp_path)
+        os.remove(temp_path)
 
-    return jsonify(result)
+        return jsonify(result)
+
+    except Exception as e:
+        print("ERREUR PROCESS:", str(e))
+        return jsonify({"error": str(e)}), 500
 
 """@app.route("/download/<filename>")
 def download(filename):
