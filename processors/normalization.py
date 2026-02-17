@@ -6,7 +6,7 @@ def normalize(df, method="minmax"):
         return df
 
     scaler = (
-        MinMaxScaler(feature_range=(-1, 1))
+        MinMaxScaler(feature_range=(0, 1))
         if method == "minmax"
         else StandardScaler()
     )
