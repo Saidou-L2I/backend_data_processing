@@ -1,10 +1,14 @@
 import numpy as np
-
+#import pandas as pd
 def handle_outliers_smart(df):
     df_res = df.copy()
-    num_cols = df.select_dtypes(include=[np.number]).columns
+    num_cols = df_res.select_dtypes(include=[np.number]).columns
 
     for col in num_cols:
+        # 🔥 1️⃣ Supprimer les valeurs négatives AVANT calcul
+        df_res.loc[df_res[col] < 0, col] = np.nan
+
+        # 🔥 2️⃣ Calculer les statistiques sans les négatifs
         Q1 = df_res[col].quantile(0.25)
         Q3 = df_res[col].quantile(0.75)
         IQR = Q3 - Q1
@@ -12,7 +16,13 @@ def handle_outliers_smart(df):
         lower = Q1 - 1.5 * IQR
         upper = Q3 + 1.5 * IQR
 
-        # Remplacer les valeurs hors bornes par lower ou upper
-        df_res[col] = np.clip(df_res[col], lower, upper)
+        median = df_res[col].median()
+
+        # 🔥 3️⃣ Détecter les outliers
+        mask = (df_res[col] < lower) | (df_res[col] > upper)
+
+        # 🔥 4️⃣ Remplacer outliers ET négatifs par médiane
+        df_res.loc[mask, col] = median
+        df_res[col].fillna(median, inplace=True)
 
     return df_res
