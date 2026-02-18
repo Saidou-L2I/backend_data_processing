@@ -18,10 +18,14 @@ class DataProcessor:
         original = analyze_data(df)
 
         df = remove_duplicates(df)
-        df = handle_missing(df, options.get("handle_missing", "fill_mean"))
+        # Nettoyage complet
+        df = handle_missing(
+            df,
+            method=options.get("handle_missing", "fill_mean"),
+            categorical_override=["OWN_OCCUPIED"]
+        )
 
-        #df=handle_outliers_smart(df)
-        df=handle_missing(df, method="fill_mean", categorical_override=["OWN_OCCUPIED"])
+        df=handle_outliers_smart(df)
 
         if options.get("normalize") == "true":
             df = normalize(df, options.get("norm_method", "minmax"))
