@@ -4,19 +4,13 @@ import pandas as pd
 def handle_missing(df, method="fill_mean", threshold=0.5):
     """
     Nettoie un DataFrame en gérant automatiquement les valeurs manquantes
-    et en homogénéisant les colonnes catégorielles selon leur type majoritaire.
-
-    Args:
-        df (pd.DataFrame): DataFrame d'entrée
-        method (str): Méthode pour remplir les colonnes numériques ["fill_mean", "fill_median", "drop"]
-        threshold (float): Seuil pour supprimer une colonne trop vide (proportion NaN)
-
-    Returns:
-        pd.DataFrame: DataFrame nettoyé
+    et en remplissant les colonnes catégorielles par leur mode.
+    Les valeurs aberrantes (types différents) dans les colonnes catégorielles
+    sont remplacées par NaN avant le remplissage.
     """
     df = df.copy()
 
-    # 1️⃣ Uniformiser toutes les valeurs manquantes connues
+    # 1️⃣ Uniformiser valeurs manquantes
     missing_values = ["--", "-", "n/a", "NA", "na", "N/A",
                       "", "null", "None", "#", "##", "###", "?", "*"]
     df.replace(missing_values, np.nan, inplace=True)
@@ -37,12 +31,8 @@ def handle_missing(df, method="fill_mean", threshold=0.5):
             # Colonne catégorielle
             df[col] = df[col].astype("category")
 
-            # Détecter la valeur majoritaire
-            value_counts = df[col].value_counts()
-            if not value_counts.empty:
-                major_value = value_counts.idxmax()
-                # Remplacer toutes les valeurs différentes par NaN
-                df[col] = df[col].apply(lambda x: x if x == major_value else np.nan)
+            # Détecter les types aberrants : garder seulement les str existants
+            df[col] = df[col].apply(lambda x: x if isinstance(x, str) else np.nan)
 
     # 3️⃣ Supprimer colonnes trop vides
     missing_ratio = df.isna().mean()
