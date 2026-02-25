@@ -25,7 +25,7 @@ class DataProcessor:
             categorical_override=["OWN_OCCUPIED"]
         )"""
         # Nettoyage automatique des valeurs manquantes
-        df = self.handle_missing(df, method=options.get("handle_missing", "fill_mean"))
+        df =handle_missing(df, method=options.get("handle_missing", "fill_mean"))
 
         df=handle_outliers_smart(df)
 
